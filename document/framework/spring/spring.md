@@ -25,6 +25,9 @@ autodetect：byType和constructor模式的结合体
 1、业务对象的构建管理
 2、业务对象之间的依赖绑定
 
+Spring的IoC容器主要有两种，即BeanFactory和ApplicationContext。
+ApplicationContext构建于BeanFactory之上，提供了许多BeanFactory之外的特性。
+
 
 ### bean的scope类型：
 singleton ：
@@ -36,3 +39,27 @@ prototype ：
 拥有prototype scope的bean定义，容器在接到该类型对象的请求的时候，会每次都重新生成一个新的对象实例给请求方
 
 自定义scope:
+
+
+### FactoryBean 的作用
+
+
+#### BeanFactoryPostProcessor容器扩展机制：
+该机制允许我们在容器实例化相应对象之前，对注册到容器的BeanDefinition所保存的信息做相应的修改。
+常用的PostProcessor：
+1、PropertyPlaceholderConfigurer
+2、PropertyOverrideConfigurer
+3、CustomEditorConfigurer：使用CustomEditorConfigurer注册自定义PropertyEditor到容器
+
+PropertyEditor 功能：
+来帮助进行String类型到其他类型的转换工作
+
+自定义PropertyEditor
+
+对于BeanFactory来说，对象实例化默认采用延迟初始化;
+ApplicationContext启动之后会实例化所有的bean定义;
+
+#### BeanPostProcessor容器扩展机制：
+1、BeanPostProcessor是存在于对象实例化阶段，而BeanFactoryPostProcessor则是存在于容器启动阶段
+2、会处理容器内所有符合条件的实例化后的对象实例
+
