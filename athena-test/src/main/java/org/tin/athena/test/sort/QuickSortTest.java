@@ -1,4 +1,4 @@
-package org.tin.athena.test;
+package org.tin.athena.test.sort;
 
 
 /**
