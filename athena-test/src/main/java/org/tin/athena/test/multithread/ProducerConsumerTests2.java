@@ -24,7 +24,7 @@ public class ProducerConsumerTests2 {
                 e.printStackTrace();
             }
 
-            if(count == MAX_COUNT){
+            while (count == MAX_COUNT){
                 try {
                     System.out.println("生产者：" + Thread.currentThread().getName() + " 等待");
                     notFull.await();
@@ -52,7 +52,7 @@ public class ProducerConsumerTests2 {
                 e.printStackTrace();
             }
 
-            if(count == 0){
+            while (count == 0){
                 try {
                     System.out.println("消费者：" + Thread.currentThread().getName() + " 等待");
                     notEmpty.await();
