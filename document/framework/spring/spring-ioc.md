@@ -20,7 +20,23 @@ autodetect：byType和constructor模式的结合体
 3、常用注解，注解实现原理
 
 4、循环依赖怎么解决
+spring针对Bean之间的循环依赖，有自己的处理方案。关键点就是三级缓存。
+当然这种方案不能解决所有的问题，他只能解决Bean单例模式下非构造函数的循环依赖。
+
 scope：配置singleton；通过setter方法注入依赖关系
+
+实现原理：
+DefaultSingletonBeanRegistry#getSingleton
+第一级缓存singletonObjects里面放置的是实例化好的单例对象。
+第二级earlySingletonObjects里面存放的是提前曝光的单例对象（没有完全装配好）。
+第三级singletonFactories里面存放的是要被实例化的对象的对象工厂。
+
+例子：A->B->C->A
+1、先创建A，然后将没有完全装配的A对象，放入缓存，然后进行初始化、成员属性赋值操作
+2、发现需要依赖B，然后创建B，流程跟A一样
+3、然后创建C，流程跟A一样
+4、C发现依赖A，然后从缓存中得到未完全初始化的A
+5、C初始化完成后，返回到B的流程，然后返回到A的流程
 
 
 ### IOC容器的职责：
@@ -92,8 +108,7 @@ public class MyBeanReplacer implements MethodReplacer{
 }
 
 
-
-#### BeanFactoryPostProcessor容器扩展机制：
+#### BeanFactoryPostProcessor 扩展机制：
 该机制允许我们在容器实例化相应对象之前，对注册到容器的BeanDefinition所保存的信息做相应的修改。
 常用的PostProcessor：
 1、PropertyPlaceholderConfigurer
@@ -108,7 +123,23 @@ PropertyEditor 功能：
 对于BeanFactory来说，对象实例化默认采用延迟初始化;
 ApplicationContext启动之后会实例化所有的bean定义;
 
-#### BeanPostProcessor容器扩展机制：
+#### BeanPostProcessor 扩展机制：
 1、BeanPostProcessor是存在于对象实例化阶段，而BeanFactoryPostProcessor则是存在于容器启动阶段
 2、会处理容器内所有符合条件的实例化后的对象实例
+
+
+### @Autowired 注解实现原理
+1、通过bean后置处理器实现：AutowiredAnnotationBeanPostProcessor 
+2、调用的地方 AbstractBeanFactory.createBean -> 子类doCreateBean
+ -> populateBean() 填充bean成员属性
+3、通过调用InstantiationAwareBeanPostProcessor 的 postProcessPropertyValues
+实现成员属性注入
+
+优先按照类型匹配，
+如果存在类型的多个实例就尝试使用类型匹配，如果确定不了，
+可以通过@Primary和@Priority注解来确定，
+如果也确定不了，最后通过名称筛选一个。
+
+如果和 @Qualifier 结合使用时，自动注入的策略就根据名称匹配了。
+
 
