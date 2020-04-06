@@ -50,7 +50,7 @@ ApplicationContext构建于BeanFactory之上，提供了许多BeanFactory之外�
 3）资源加载
 4）父子容器
 5）环境配置项信息：EnvironmentCapable # Environment
-6）支持查看更多信息： ListableBeanFactory
+6）支持查看更多信息：ListableBeanFactory
 
 
 ### bean的 scope 类型：
