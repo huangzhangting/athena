@@ -1,10 +1,56 @@
-
 ## ConcurrentHashMap
 
-##### 无锁读操作：
-在1.8中ConcurrentHashMap的get操作全程不需要加锁
-get操作全程不需要加锁是因为Node的成员val是用volatile修饰的和数组用volatile修饰没有关系
-数组用volatile修饰主要是保证在数组扩容的时候保证可见性
+#### 1.7版本
+锁数组：Segment<K,V>[] segments，锁数组个数，就是并发度，默认16，可以传参数指定
+锁Segment里面维护键值对数组
+
+put操作：
+1、根据hash值计算属于哪个段锁
+2、获取段锁，存入元素
+
+get操作：
+1、根据hash值计算属于哪个段锁
+2、获取段锁，查找元素
+
+size方法
+无锁统计两次，如果两次结果不一致，则加锁统计
+
+
+#### 1.8版本之后
+1、CAS无锁算法与synchronized保证并发安全，
+2、支持并发扩容，
+3、数据结构变更为数组+链表+红黑树，提高性能。
+
+#### put操作：for(;;)循环
+1、根据(n - 1) & hash找到位置，如果不存在数据，则通过CAS设置
+2、如果该位置节点存在了，则使用头节点加锁 synchronized (f)
+3、加入成功后，维护元素个数：baseCount、counterCells
+4、如果发现节点正在扩容转移，则该线程加入帮忙转移数据
+
+
+#### 无锁读操作：
+get操作可以无锁是由于Node的元素val和指针next是用volatile修饰的
+
+##### 既然volatile修饰数组对get操作没有效果那加在数组上的volatile的目的是什么呢？
+其实就是为了使得Node数组在扩容的时候对其他线程具有可见性而加的volatile
+
+
+#### 扩容
+tryPresize(int size);
+transfer()方法
+
+成员属性：
+volatile int sizeCtl
+volatile Node<K,V>[] nextTable
+
+并发扩容总结
+1、单线程新建nextTable，新容量一般为原table容量的两倍。
+2、每个线程想增/删元素时，如果访问的桶是ForwardingNode节点，则表明当前正处于扩容状态，协助一起扩容完成后再完成相应的数据更改操作。
+3、扩容时将原table的所有桶倒序分配，每个线程每次最小分配16个桶，防止资源竞争导致的效率下降。
+单个桶内元素的迁移是加锁的，但桶范围处理分配可以多线程，在没有迁移完成所有桶之前每个线程需要重复获取迁移桶范围，直至所有桶迁移完成。
+4、一个旧桶内的数据迁移完成但不是所有桶都迁移完成时，查询数据委托给ForwardingNode结点查询nextTable完成（这个后面看find()分析）。
+5、迁移过程中sizeCtl用于记录参与扩容线程的数量，全部迁移完成后sizeCtl更新为新table容量的0.75倍。
+
 
 
 #### 如何在很短的时间内将大量数据插入到ConcurrentHashMap，换句话说，就是提高ConcurrentHashMap的插入效率
