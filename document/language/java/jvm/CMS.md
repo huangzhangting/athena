@@ -17,11 +17,26 @@ CMS全称 ConcurrentMarkSweep，是一款并发的、使用标记-清除算法�
 
 为了提高重新标记的效率，该阶段会把上述对象所在的Card标识为Dirty，后续只需扫描这些Dirty Card的对象，避免扫描整个老年代。
 
+2.1 预清理阶段
+扫描处理Dirty Card中的对象
+
 3、重标记(STW)  
 这个阶段是多线程的, 暂停所有用户线程。
-遍历老年代的Dirty Card，重新标记。
+
+遍历新生代对象，重新标记
+根据GC Roots，重新标记
+遍历老年代的Dirty Card，重新标记，这里的Dirty Card大部分已经在clean阶段处理过
+
+减少remark阶段停顿
+一般CMS的GC耗时80%都在remark阶段，如果发现remark阶段停顿时间很长，可以尝试添加该参数：
+-XX:+CMSScavengeBeforeRemark。
+在执行remark操作之前先做一次Young GC，目的在于减少年轻代对老年代的无效引用，降低remark时的开销。
+
 
 4、并发清理。用户线程被重新激活，同时清理那些无效的对象。
 
 5、重置。 CMS清除内部状态，为下次回收做准备。
 
+
+#### 相关参数
+-XX:CMSInitiatingOccupancyFraction=70 是指设定CMS在对内存占用率达到70%的时候开始GC
