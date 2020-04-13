@@ -7,4 +7,6 @@
 针对class，代理类继承目标类
 缺点：不能覆写final方法
 
+通过BeanPostProcessor来创建代理类：
+AbstractAutoProxyCreator # postProcessAfterInitialization
 

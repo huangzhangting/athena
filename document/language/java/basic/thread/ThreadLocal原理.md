@@ -9,7 +9,7 @@
 #### ThreadLocalMap
 1、ThreadLocalMap的数据结构仅仅是数组
 2、ThreadLocalMap 是通过开放地址法来解决hash 冲突的问题
-3、ThreadLocalMap里面的Entry 内部类中的key 是弱引用，value 是强引用
+3、ThreadLocalMap里面的Entry 内部类中的key 被弱引用指向，value 是强引用
 
 #### 为什么选择开放地址法
 特点：
@@ -32,4 +32,11 @@
 remove 、get 和set 方法都可能触发清理方法expungeStaleEntry()
 清理key已经被回收的value，因为是开放地址法，所以清理完后还要将后面的元素交换过来，
 不然下次存入数据时，前面的位置已经为null了，可以直接存入数据，这样就会出现重复的key，
+
+清理key已经被回收的数据
+if (k == null) {
+    e.value = null;
+    tab[i] = null;
+    size--;
+}
 
