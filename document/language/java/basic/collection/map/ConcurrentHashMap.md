@@ -40,6 +40,7 @@ tryPresize(int size);
 transfer()方法
 
 成员属性：
+volatile int transferIndex
 volatile int sizeCtl
 volatile Node<K,V>[] nextTable
 

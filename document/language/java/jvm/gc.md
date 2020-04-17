@@ -30,3 +30,13 @@
 java堆分为新生代和老年代，各个年代使用不同的回收算法，
 在新生代中，发生gc后，只有少量对象存活，可以使用复制算法
 
+
+##### 什么是空间分配担保策略？
+JVM在发生Minor GC之前，虚拟机会检查老年代最大可用的连续空间是否大于新生代所有对象的总空间，
+如果大于，则此次Minor GC是安全的
+如果小于，则虚拟机会查看HandlePromotionFailure设置项的值是否允许担保失败。
+如果HandlePromotionFailure=true，那么会继续检查老年代最大可用连续空间是否大于历次晋升到老年代的对象的平均大小，
+如果大于则尝试进行一次Minor GC，但这次Minor GC依然是有风险的；
+如果小于或者HandlePromotionFailure=false，则改为进行一次Full GC。
+
+

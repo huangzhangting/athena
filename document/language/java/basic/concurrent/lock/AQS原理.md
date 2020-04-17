@@ -55,7 +55,7 @@ ConditionObject implements Condition 里面会维护等待队列
 2、释放锁release()方法，唤醒后继节点
 3、线程进入等待状态：LockSupport.park(this);
 当别的线程调用了signal（），并且是当前线程被唤醒的时候才从park()方法返回
-4、当被唤醒后，该线程会尝试去获取锁，acquireQueued()
+4、当被唤醒后，该线程会申请排队，acquireQueued()
 
 唤醒
 1、线程调用condition.signal()方法，
