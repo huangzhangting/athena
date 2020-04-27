@@ -52,6 +52,7 @@ volatile Node<K,V>[] nextTable
 4、一个旧桶内的数据迁移完成但不是所有桶都迁移完成时，查询数据委托给ForwardingNode结点查询nextTable完成（这个后面看find()分析）。
 5、迁移过程中sizeCtl用于记录参与扩容线程的数量，全部迁移完成后sizeCtl更新为新table容量的0.75倍。
 
+多线程无锁扩容的关键就是通过CAS设置 sizeCtl 与 transferIndex 变量，协调多个线程对table数组中的node进行迁移。
 
 
 #### 如何在很短的时间内将大量数据插入到ConcurrentHashMap，换句话说，就是提高ConcurrentHashMap的插入效率

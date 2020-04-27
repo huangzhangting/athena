@@ -16,7 +16,8 @@ public class OverloadTest {
 
 
     public static void main(String[] args) {
-
+        int i = (1 << (32 - 16)) - 1;
+        System.out.println(i);
     }
 
 
